@@ -14,10 +14,12 @@ body {
   min-width: 320px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 }
 
 #root {
   min-height: 100vh;
+  width: 100%;
 }
 
 /* Selection color */
@@ -61,5 +63,18 @@ ul, ol {
 /* Input defaults */
 input, textarea, select {
   font: inherit;
+}
+
+/* Viewport meta tag simulation - ensures proper scaling */
+@media screen and (max-width: 540px) {
+  html {
+    font-size: 14px;
+  }
+}
+
+@media screen and (max-width: 380px) {
+  html {
+    font-size: 13px;
+  }
 }
 
