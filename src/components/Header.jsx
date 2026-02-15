@@ -563,12 +563,95 @@ function Header() {
           <button 
             className="mobile-menu-btn"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            style={{ display: 'none' }}
           >
             {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
       </header>
+
+      {/* Mobile Menu Overlay */}
+      {mobileMenuOpen && (
+        <div className="mobile-menu-overlay" onClick={() => setMobileMenuOpen(false)}>
+          <div className="mobile-menu" onClick={e => e.stopPropagation()}>
+            <div className="mobile-menu-header">
+              <Link to="/" className="logo" onClick={() => setMobileMenuOpen(false)}>
+                Pascal<span>Hub</span>
+              </Link>
+              <button onClick={() => setMobileMenuOpen(false)}>
+                <X size={24} />
+              </button>
+            </div>
+            <div className="mobile-menu-content">
+              {user ? (
+                <div className="mobile-user-info">
+                  <div style={{ 
+                    width: '48px', 
+                    height: '48px', 
+                    borderRadius: '50%', 
+                    background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'white',
+                    fontWeight: '600',
+                    fontSize: '18px'
+                  }}>
+                    {user.user_metadata?.name?.[0] || user.email?.[0]?.toUpperCase()}
+                  </div>
+                  <div>
+                    <p style={{ fontWeight: '600', color: '#1a1a2e' }}>{user.user_metadata?.name || user.email}</p>
+                    <p style={{ fontSize: '12px', color: '#6b7280' }}>{user.email}</p>
+                  </div>
+                </div>
+              ) : (
+                <button 
+                  className="mobile-login-btn" 
+                  onClick={() => {
+                    setMobileMenuOpen(false)
+                    setLoginOpen(true)
+                  }}
+                >
+                  Login / Sign Up
+                </button>
+              )}
+              
+              <Link 
+                to={user ? "/create" : "#"} 
+                className="mobile-sell-btn"
+                onClick={(e) => {
+                  if (!user) {
+                    e.preventDefault()
+                    setMobileMenuOpen(false)
+                    setLoginOpen(true)
+                  } else {
+                    setMobileMenuOpen(false)
+                  }
+                }}
+              >
+                <Plus size={20} />
+                <span>Sell Item</span>
+              </Link>
+              
+              {user && (
+                <button 
+                  className="mobile-logout-btn"
+                  onClick={handleLogout}
+                >
+                  Logout
+                </button>
+              )}
+              
+              <div className="mobile-menu-links">
+                <Link to="/" onClick={() => setMobileMenuOpen(false)}>Home</Link>
+                <Link to="/?category=vehicles" onClick={() => setMobileMenuOpen(false)}>Vehicles</Link>
+                <Link to="/?category=property" onClick={() => setMobileMenuOpen(false)}>Property</Link>
+                <Link to="/?category=electronics" onClick={() => setMobileMenuOpen(false)}>Electronics</Link>
+                <Link to="/?category=furniture" onClick={() => setMobileMenuOpen(false)}>Furniture</Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <LoginModal 
         isOpen={loginOpen} 
