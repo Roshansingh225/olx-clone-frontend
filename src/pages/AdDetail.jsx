@@ -78,10 +78,10 @@ function AdDetail() {
     setCurrentImageIndex((prev) => (prev - 1 + adImages.length) % adImages.length)
   }
 
-  const sellerInfo = ad.seller || { name: 'Unknown', memberSince: '2024', phone: 'N/A' }
+  const sellerInfo = ad.seller || { name: ad.name || 'Unknown', memberSince: '2024', phone: 'N/A' }
   
-  // Ensure phone is always available
-  const displayPhone = sellerInfo.phone || 'N/A'
+  // Ensure phone is always available - try multiple sources
+  const displayPhone = sellerInfo.phone || ad.phone || 'N/A'
 
   return (
     <div className="ad-detail">
@@ -247,15 +247,25 @@ function AdDetail() {
               </div>
             </div>
 
-            <button className="contact-btn">
+            <a 
+              href={`tel:${displayPhone.replace(/\s/g, '')}`}
+              className="contact-btn"
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }}
+            >
               <Phone size={18} style={{ marginRight: '8px' }} />
               {displayPhone}
-            </button>
+            </a>
             
-            <button className="contact-btn" style={{ background: '#002F34', color: 'white' }}>
+            <a 
+              href={`https://wa.me/${displayPhone.replace(/\s/g, '').replace('+', '')}?text=Hi, I'm interested in your ad: ${ad.title}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="contact-btn"
+              style={{ background: '#002F34', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }}
+            >
               <MessageCircle size={18} style={{ marginRight: '8px' }} />
               Chat with Seller
-            </button>
+            </a>
           </div>
         </div>
 

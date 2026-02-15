@@ -9,13 +9,35 @@ export const getAllAds = async () => {
   try {
     const response = await fetch(`${API_BASE_URL}/ads`)
     if (!response.ok) throw new Error('Failed to fetch ads')
-    const data = await response.json()
+    let data = await response.json()
     
     // If MongoDB is empty, fall back to localStorage/mock data
     if (!data || data.length === 0) {
       console.log('MongoDB is empty, using localStorage fallback')
       return getStoredAds()
     }
+    
+    // Ensure each ad has seller info
+    data = data.map(ad => {
+      if (!ad.seller || !ad.seller.phone) {
+        // Try to find matching mock ad for seller info
+        const mockAds = getStoredAds()
+        const mockAd = mockAds.find(m => m.title === ad.title)
+        if (mockAd && mockAd.seller && mockAd.seller.phone) {
+          return { ...ad, seller: mockAd.seller }
+        }
+        // Add default seller info
+        return {
+          ...ad,
+          seller: ad.seller || {
+            name: 'Unknown Seller',
+            memberSince: '2024',
+            phone: '+91 98765 43210'
+          }
+        }
+      }
+      return ad
+    })
     
     return data
   } catch (err) {
@@ -30,20 +52,52 @@ export const getAdById = async (id) => {
   try {
     const response = await fetch(`${API_BASE_URL}/ads/${id}`)
     if (!response.ok) throw new Error('Failed to fetch ad')
-    const adData = await response.json()
+    let adData = await response.json()
     
-    // If MongoDB returns nothing, try localStorage
-    if (!adData) {
-      const ads = getStoredAds()
-      return ads.find(ad => ad.id === parseInt(id) || ad._id === id)
+    // If MongoDB returns an ad, ensure it has seller info
+    if (adData) {
+      // Merge with mock data to ensure seller info exists
+      const mockAds = getStoredAds()
+      const mockAd = mockAds.find(ad => 
+        ad.id === parseInt(id) || 
+        ad._id === id || 
+        ad.id === id ||
+        String(ad.id) === id
+      )
+      
+      if (mockAd) {
+        adData = { ...mockAd, ...adData }
+      }
+      
+      // Ensure seller info is always available
+      if (!adData.seller || !adData.seller.phone) {
+        adData.seller = {
+          name: adData.seller?.name || adData.name || 'Unknown',
+          memberSince: adData.seller?.memberSince || '2024',
+          phone: adData.seller?.phone || adData.phone || '+91 98765 43210'
+        }
+      }
+      
+      return adData
     }
     
-    return adData
+    // If MongoDB returns nothing, try localStorage
+    const ads = getStoredAds()
+    return ads.find(ad => 
+      ad.id === parseInt(id) || 
+      ad._id === id ||
+      String(ad.id) === id ||
+      id.startsWith(ad._id)
+    )
   } catch (err) {
     console.log('Error fetching from MongoDB:', err)
     // Fallback to localStorage
     const ads = getStoredAds()
-    return ads.find(ad => ad.id === parseInt(id) || ad._id === id)
+    return ads.find(ad => 
+      ad.id === parseInt(id) || 
+      ad._id === id ||
+      String(ad.id) === id
+    )
   }
 }
 
