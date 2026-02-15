@@ -1168,14 +1168,31 @@ input, select, textarea {
     display: none;
   }
   
+  /* Always show header actions on mobile */
   .header-actions {
-    display: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    order: 2;
+  }
+  
+  /* Compact buttons for mobile */
+  .login-btn {
+    padding: 8px 14px;
+    font-size: 13px;
+  }
+  
+  .sell-btn {
+    padding: 8px 16px;
+    font-size: 13px;
+  }
+  
+  .sell-btn span {
+    display: inline;
   }
   
   .mobile-menu-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: none;
   }
   
   .hero h1 {
